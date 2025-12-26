@@ -39,6 +39,8 @@ Todo that you need to follow the Tuya Device Preparation Section of tinytuya :
 
 https://github.com/jasonacox/tinytuya?tab=readme-ov-file#tuya-device-preparation
 
+TODO -- does this work? Do you need to pair through the Proscenic App first? How does that
+work with or against the Tuya Apps?
 
 ### Configuration via editing configuration.yaml
 
