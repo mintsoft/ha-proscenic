@@ -89,13 +89,13 @@ class CurrentState(Enum):
         return obj
 
     # ignore the first param since it's already set by __new__
-    def __init__(self, _: int, ha_sate: str):
-        self._ha_sate_ = ha_sate
+    def __init__(self, _: int, ha_state: str):
+        self._ha_state_ = ha_state
 
     @property
-    def ha_sate(self) -> str:
+    def ha_state(self) -> str:
         """Returns the corresponding state, defined by HA"""
-        return self._ha_sate_
+        return self._ha_state_
 
     STAND_BY = 0, VacuumActivity.IDLE
     CLEAN_SMART = 1, VacuumActivity.CLEANING
@@ -220,7 +220,7 @@ class ProscenicVacuum(StateVacuumEntity):
         return self._name
 
     @property
-    def state(self) -> VacuumActivity | None:
+    def activity(self) -> VacuumActivity | None:
         """Return the status of the vacuum cleaner."""
         if self._fault != Fault.NO_ERROR:
             return VacuumActivity.Error
@@ -228,7 +228,7 @@ class ProscenicVacuum(StateVacuumEntity):
         if self._current_state is None:
             return None
         else:
-            return self._current_state.ha_sate
+            return self._current_state.ha_state
 
     @property
     def battery_level(self) -> Optional[int]:
