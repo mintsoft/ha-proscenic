@@ -220,7 +220,7 @@ class ProscenicVacuum(StateVacuumEntity):
         return self._name
 
     @property
-    def state(self) -> Optional[STATES]:
+    def state(self) -> VacuumActivity | None:
         """Return the status of the vacuum cleaner."""
         if self._fault != Fault.NO_ERROR:
             return VacuumActivity.Error
