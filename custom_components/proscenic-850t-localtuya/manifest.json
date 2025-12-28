@@ -1,0 +1,15 @@
+{
+  "domain": "proscenic-850t-localtuya",
+  "name": "Proscenic 850T LocalTuya",
+  "documentation": "https://github.com/mintsoft/ha-proscenic/blob/master/README.md",
+  "issue_tracker": "https://github.com/mintsoft/ha-proscenic/issues",
+  "requirements": ["pycryptodome>=3.9.7", "tinytuya==1.14.0"],
+  "dependencies": [],
+  "version": "0.1.0",
+  "codeowners": [
+    "@edenhaus",
+    "@FeikoJoosten",
+    "@MrVidipy",
+    "@mintsoft"
+  ]
+}

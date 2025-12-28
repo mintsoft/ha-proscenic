@@ -1,52 +1,44 @@
 """Support for the Proscenic vacuum cleaner robot."""
+
 import asyncio
 import logging
 from enum import Enum, IntFlag
 from functools import partial
-from typing import Optional, Union, Dict
+from typing import Dict, Optional, Union
 
-from homeassistant.helpers import config_validation as cv, entity_platform
 import voluptuous as vol
 from homeassistant.components.vacuum import (
-    PLATFORM_SCHEMA,
-    STATE_CLEANING,
-    STATE_DOCKED,
-    STATE_ERROR,
-    STATE_IDLE,
-    STATE_PAUSED,
-    VacuumEntityFeature,
-    StateVacuumEntity,
-    STATE_RETURNING,
     ATTR_CLEANED_AREA,
-    DOMAIN
+    DOMAIN,
+    PLATFORM_SCHEMA,
+    StateVacuumEntity,
+    VacuumActivity,
+    VacuumEntityFeature,
 )
-from homeassistant.const import (
-    CONF_HOST,
-    CONF_NAME,
-    CONF_DEVICE_ID)
+from homeassistant.const import CONF_DEVICE_ID, CONF_HOST, CONF_NAME
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import entity_platform
 from tinytuya import OutletDevice as Device
 
 from .const import (
-    CONF_LOCAL_KEY,
-    DEFAULT_NAME,
-    CONF_REMEMBER_FAN_SPEED,
-    CONF_ENABLE_DEBUG,
-    ATTR_ERROR,
-    ATTR_CLEANING_TIME,
-    ATTR_MOP_EQUIPPED,
-    ATTR_SENSOR_HEALTH,
-    ATTR_FILTER_HEALTH,
-    ATTR_SIDE_BRUSH_HEALTH,
     ATTR_BRUSH_HEALTH,
-    ATTR_RESET_FILTER,
+    ATTR_CLEANING_TIME,
     ATTR_DEVICE_MODEL,
+    ATTR_ERROR,
+    ATTR_FILTER_HEALTH,
+    ATTR_MOP_EQUIPPED,
+    ATTR_RESET_FILTER,
+    ATTR_SENSOR_HEALTH,
+    ATTR_SIDE_BRUSH_HEALTH,
     ATTR_WATER_SPEED,
     ATTR_WATER_SPEED_LIST,
-    REMEMBER_FAN_SPEED_DELAY,
+    CONF_ENABLE_DEBUG,
+    CONF_LOCAL_KEY,
+    CONF_REMEMBER_FAN_SPEED,
     DATA_KEY,
-    STATE_MOPPING,
-    STATES,
-    SERVICE_SET_WATER_SPEED
+    DEFAULT_NAME,
+    REMEMBER_FAN_SPEED_DELAY,
+    SERVICE_SET_WATER_SPEED,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -58,20 +50,20 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Required(CONF_LOCAL_KEY): vol.All(str, vol.Length(min=15, max=16)),
         vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
         vol.Optional(CONF_REMEMBER_FAN_SPEED, default=False): cv.boolean,
-        vol.Optional(CONF_ENABLE_DEBUG, default=False): cv.boolean
+        vol.Optional(CONF_ENABLE_DEBUG, default=False): cv.boolean,
     },
     extra=vol.ALLOW_EXTRA,
 )
 
 SUPPORT_PROSCENIC = (
-        VacuumEntityFeature.STATE
-        | VacuumEntityFeature.STOP
-        | VacuumEntityFeature.RETURN_HOME
-        | VacuumEntityFeature.FAN_SPEED
-        | VacuumEntityFeature.BATTERY
-        | VacuumEntityFeature.CLEAN_SPOT
-        | VacuumEntityFeature.START
-        | VacuumEntityFeature.PAUSE
+    VacuumEntityFeature.STATE
+    | VacuumEntityFeature.STOP
+    | VacuumEntityFeature.RETURN_HOME
+    | VacuumEntityFeature.FAN_SPEED
+    | VacuumEntityFeature.BATTERY
+    | VacuumEntityFeature.CLEAN_SPOT
+    | VacuumEntityFeature.START
+    | VacuumEntityFeature.PAUSE
 )
 
 
@@ -105,15 +97,15 @@ class CurrentState(Enum):
         """Returns the corresponding state, defined by HA"""
         return self._ha_sate_
 
-    STAND_BY = 0, STATE_IDLE
-    CLEAN_SMART = 1, STATE_CLEANING
-    MOPPING = 2, STATE_MOPPING
-    CLEAN_WALL_FOLLOW = 3, STATE_CLEANING
-    GOING_CHARGING = 4, STATE_RETURNING
-    CHARGING = 5, STATE_DOCKED
+    STAND_BY = 0, VacuumActivity.IDLE
+    CLEAN_SMART = 1, VacuumActivity.CLEANING
+    MOPPING = 2, VacuumActivity.CLEANING
+    CLEAN_WALL_FOLLOW = 3, VacuumActivity.CLEANING
+    GOING_CHARGING = 4, VacuumActivity.RETURNING
+    CHARGING = 5, VacuumActivity.DOCKED
     #    ??? = 6, ??? todo find it out
-    PAUSE = 7, STATE_PAUSED
-    CLEAN_SINGLE = 8, STATE_CLEANING
+    PAUSE = 7, VacuumActivity.PAUSED
+    CLEAN_SINGLE = 8, VacuumActivity.CLEANING
 
 
 # rw=read/write, ro=read only
@@ -128,14 +120,14 @@ class Fields(Enum):
     CLEAN_RECORD = 40  # ro
     CLEAN_AREA = 41  # ro
     CLEAN_TIME = 42  # ro
-    SENSOR_HEALTH = 44 #ro
-    FILTER_HEALTH = 45 #ro
-    SIDE_BRUSH_HEALTH = 47 #ro
-    BRUSH_HEALTH = 48 #ro
-    SWEEP_OR_MOP = 49 # ro
-    RESET_FILTER = 52 #ro
-    DEVICE_MODEL = 58 #ro
-    WATER_SPEED = 60 #rw
+    SENSOR_HEALTH = 44  # ro
+    FILTER_HEALTH = 45  # ro
+    SIDE_BRUSH_HEALTH = 47  # ro
+    BRUSH_HEALTH = 48  # ro
+    SWEEP_OR_MOP = 49  # ro
+    RESET_FILTER = 52  # ro
+    DEVICE_MODEL = 58  # ro
+    WATER_SPEED = 60  # rw
 
 
 class CleaningMode(Enum):
@@ -160,6 +152,7 @@ class FanSpeed(Enum):
     ECO = "ECO"
     NORMAL = "normal"
     STRONG = "strong"
+
 
 class WaterSpeedMode(Enum):
     LOW = "small"
@@ -194,10 +187,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     hass.data[DOMAIN].async_register_entity_service(
         SERVICE_SET_WATER_SPEED,
-        {
-            vol.Required(ATTR_WATER_SPEED):
-                vol.All(vol.Coerce(str))
-        },
+        {vol.Required(ATTR_WATER_SPEED): vol.All(vol.Coerce(str))},
         ProscenicVacuum.async_set_water_speed.__name__,
     )
 
@@ -205,7 +195,9 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 class ProscenicVacuum(StateVacuumEntity):
     """Representation of a Proscenic Vacuum cleaner robot."""
 
-    def __init__(self, name: str, device: Device, remember_fan_speed: bool, enable_debug: bool):
+    def __init__(
+        self, name: str, device: Device, remember_fan_speed: bool, enable_debug: bool
+    ):
         """Initialize the Proscenic vacuum cleaner robot."""
         self._name = name
         self._device = device
@@ -228,10 +220,10 @@ class ProscenicVacuum(StateVacuumEntity):
         return self._name
 
     @property
-    def state(self) -> Optional[STATES]:
+    def state(self) -> VacuumActivity | None:
         """Return the status of the vacuum cleaner."""
         if self._fault != Fault.NO_ERROR:
-            return STATE_ERROR
+            return VacuumActivity.Error
 
         if self._current_state is None:
             return None
@@ -325,7 +317,7 @@ class ProscenicVacuum(StateVacuumEntity):
                 fan_speed,
                 self.fan_speed_list,
             )
-            
+
     async def async_set_water_speed(self, water_speed: str, **kwargs):
         """Set mop water speed."""
         try:
@@ -352,7 +344,9 @@ class ProscenicVacuum(StateVacuumEntity):
     async def async_remote_control(self, direction: str):
         """Move vacuum with remote control mode."""
         try:
-            await self._execute_command(Fields.DIRECTION_CONTROL, DirectionControl[direction.upper()])
+            await self._execute_command(
+                Fields.DIRECTION_CONTROL, DirectionControl[direction.upper()]
+            )
         except KeyError:
             _LOGGER.error(
                 "Direction not recognized (%s). Valid directions are: %s",
@@ -375,18 +369,18 @@ class ProscenicVacuum(StateVacuumEntity):
             if self._remember_fan_speed and field == Fields.CLEANING_MODE:
                 await self._wait_and_set_stored_fan_speed()
         except Exception:
-            _LOGGER.error(
-                "Could not execute command &s with value %s",
-                field,
-                value
-            )
+            _LOGGER.error("Could not execute command &s with value %s", field, value)
 
     def _parse_status_fields(self, state: Dict[str, Union[str, int, float, bool]]):
         """Tries to parse the state into the corresponding fields"""
         for k, v in state.items():
             try:
                 field = Fields(int(k))
-                if field in (Fields.POWER, Fields.CLEANING_MODE, Fields.DIRECTION_CONTROL):
+                if field in (
+                    Fields.POWER,
+                    Fields.CLEANING_MODE,
+                    Fields.DIRECTION_CONTROL,
+                ):
                     continue
 
                 elif field == Fields.FAULT:
@@ -419,7 +413,9 @@ class ProscenicVacuum(StateVacuumEntity):
                     self._additional_attr[ATTR_CLEANING_TIME] = int(v)
 
                 elif field == Fields.SWEEP_OR_MOP:
-                    self._additional_attr[ATTR_MOP_EQUIPPED] = False if v == "sweep" else True
+                    self._additional_attr[ATTR_MOP_EQUIPPED] = (
+                        False if v == "sweep" else True
+                    )
 
                 elif field == Fields.SENSOR_HEALTH:
                     self._additional_attr[ATTR_SENSOR_HEALTH] = int(v)
@@ -432,10 +428,10 @@ class ProscenicVacuum(StateVacuumEntity):
 
                 elif field == Fields.BRUSH_HEALTH:
                     self._additional_attr[ATTR_BRUSH_HEALTH] = int(v)
-                
+
                 elif field == Fields.RESET_FILTER:
                     self._additional_attr[ATTR_RESET_FILTER] = v
-                
+
                 elif field == Fields.DEVICE_MODEL:
                     self._additional_attr[ATTR_DEVICE_MODEL] = v
 
@@ -445,13 +441,13 @@ class ProscenicVacuum(StateVacuumEntity):
                     self._additional_attr[ATTR_WATER_SPEED_LIST] = self.water_speed_list
 
             except (KeyError, ValueError):
-                if self._enable_debug == True: 
+                if self._enable_debug == True:
                     _LOGGER.warning(
                         "An error occurred during the processing of the following item (%s:%s)",
                         k,
-                        v
+                        v,
                     )
-                
+
                 continue
 
     async def _wait_and_set_stored_fan_speed(self):

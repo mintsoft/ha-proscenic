@@ -1,10 +1,7 @@
 {
-  "name": "Proscenic vacuum cleaner",
+  "name": "Proscenic 850T localtuya control",
   "domains": [ "vacuum"],
-  "country": ["IT", "AT"],
   "iot_class": "Local Polling",
-  "zip_release": true,
-  "filename": "proscenic.zip",
-  "hide_default_branch": true,
-  "homeassistant": "0.109.0"
+  "homeassistant": "2025.12.4",
+  "hacs": "2.0.5"
 }

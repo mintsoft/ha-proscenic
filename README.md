@@ -1,46 +1,35 @@
 [![License](https://img.shields.io/github/license/edenhaus/ha-prosenic?style=for-the-badge)](LICENSE.md)
 
 # Proscenic Home Assistant component
+## Prior-art
+* This is a fork based on [edenhaus work](https://github.com/edenhaus/ha-prosenic/tree/master)
+* [FeikoJoosten fork](https://github.com/FeikoJoosten/ha-prosenic)
+* [MrVidipy fork](https://github.com/MrVidipy/ha-proscenic)
 
-## This is a fork based on [edenhaus work](https://github.com/edenhaus/ha-prosenic/tree/master)
-### I also used work from [FeikoJoosten fork](https://github.com/FeikoJoosten/ha-prosenic)
-
-A full featured Homeassistant component to control Proscenic vacuum cleaner locally without the cloud.
 This component is based on the underlying tinytuya library available [here](https://github.com/jasonacox/tinytuya).
 
-## Towards Homeassistant official integration
-
-My personal goal is to make this component fully compliant with Homeassistant, so
-that it may be added as the official library to handle Proscenic vacuum cleaners.
-However, before pushing a PullRequest to the official Homeassistant repository, I would like to share it to some users.
-In this way we can test it massively, check it for any bug and make it **robust enough** to be seamlessly integrated
-with Homeassistant.
-
 ## Installation
+At current, the only way to install this is to copy the `custom_components/proscenic-850t-localtuya` directory into your `custom_components directory` so it looks like so:
+```
+└── ...
+└── configuration.yaml
+└── secrects.yaml
+└── custom_components
+    └── proscenic-850t-localtuya
+        └── __init__.py
+        └── const.py
+        └── ...
+```
 
-You can install this component manually.
-
-1.  Clone the git master branch
-2.  Unzip/copy the proscenic direcotry within the `custom_components` directory of your homeassistant installation.
-    The `custom_components` directory resides within your homeassistant configuration directory.
-    In other words, the configuration directory of homeassistant is where the configuration.yaml file is located.
-    After a correct installation, your configuration directory should look like the following.
-    `└── ... └── configuration.yaml └── secrects.yaml └── custom_components └── proscenic └── __init__.py └── const.py └── ...`
-
-        **Note**: if the custom_components directory does not exist, you need to create it.
+**Note**: if the custom_components directory does not exist, you need to create it.
 
 ## Component setup
 
 Once the component has been installed, you need to configure it in order to make it work.
 
-First we need to find out the _device_id_, _ip address_ and _local key_ of your proscenic vacuum cleaner.
-
-Todo that you need to follow the Tuya Device Preparation Section of tinytuya :
-
-https://github.com/jasonacox/tinytuya?tab=readme-ov-file#tuya-device-preparation
-
-TODO -- does this work? Do you need to pair through the Proscenic App first? How does that
-work with or against the Tuya Apps?
+First we need to find out the _device_id_, _ip address_ and _local key_ of your 850T.
+The only way that I have found to do this is to use a rooted android phone or emulator, frida, termux and extract the key by tracing the official Android Proscenic App.
+* https://community.home-assistant.io/t/retrieve-localkey-for-tuya-based-devices-using-bluestacks-and-frida/584550
 
 ### Configuration via editing configuration.yaml
 
@@ -50,6 +39,7 @@ work with or against the Tuya Apps?
    ```yaml 
       vacuum: 
       - platform: "prosenic"
+        name: "Vaccumie"
         host: "YOUR_HOST_IP"
         device_id: "YOUR_DEVICE_ID"
         local_key: "YOUR_LOCAL_KEY"
@@ -57,19 +47,5 @@ work with or against the Tuya Apps?
    ```
    **Note!** If you have already configured other vacuum robot, add your configuration there.
 
-1. Reboot hassio (check for any errors in the logs)
+1. Reboot Home Assistant (check for any errors in the logs)
 1. Congrats! You're all set! It should appear in Entities
-
-## Additional Information
-
-Currently this integration is only tested with a Proscenic 850T, because I only have this one.
-Please give me feedback, if it works with other models too.
-
-The integration is communicating locally only, so you can block the access of your vacuum robot to the internet.
-
-If you find a problem/bug or you have a feature request, please open an issue.
-
-## What's next?
-
-- Better error handling
-- Automated test
