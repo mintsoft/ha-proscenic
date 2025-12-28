@@ -4,8 +4,8 @@ from homeassistant.components.vacuum import (
     STATES as VACUUM_STATES
 )
 
-DOMAIN = "proscenic"
-DEFAULT_NAME = "Proscenic Vacuum cleaner"
+DOMAIN = "proscenic-850t"
+DEFAULT_NAME = "Proscenic 850T Vacuum cleaner"
 DATA_KEY = f"{VACUUM_DOMAIN}.{DOMAIN}"
 
 CONF_LOCAL_KEY = "local_key"
