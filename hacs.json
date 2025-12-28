@@ -1,7 +1,7 @@
 {
-  "name": "Proscenic vacuum cleaner",
+  "name": "Proscenic 850T vacuum cleaner",
   "domains": [ "vacuum"],
-  "country": ["IT", "AT"],
+  "country": ["UK"],
   "iot_class": "Local Polling",
   "zip_release": true,
   "filename": "proscenic.zip",
