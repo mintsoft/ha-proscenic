@@ -10,10 +10,10 @@ This component is based on the underlying tinytuya library available [here](http
 
 ## Installation
 
-###HACS
+### HACS
 If you have [HACS](https://hacs.xyz/) available in your Home Assistant then add this repository as a [custom respository](https://hacs.xyz/docs/faq/custom_repositories/)
  
-###Manual
+### Manual
 Copy the `custom_components/proscenic-850t-localtuya` directory into your `custom_components directory` so it looks like so:
 ```
 └── ...
