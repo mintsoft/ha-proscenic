@@ -99,7 +99,7 @@ class CurrentState(Enum):
 
     STAND_BY = 0, VacuumActivity.IDLE
     CLEAN_SMART = 1, VacuumActivity.CLEANING
-    MOPPING = 2, VacuumActivity.MOPPING
+    MOPPING = 2, VacuumActivity.CLEANING
     CLEAN_WALL_FOLLOW = 3, VacuumActivity.CLEANING
     GOING_CHARGING = 4, VacuumActivity.RETURNING
     CHARGING = 5, VacuumActivity.DOCKED
