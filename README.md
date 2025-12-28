@@ -9,7 +9,12 @@
 This component is based on the underlying tinytuya library available [here](https://github.com/jasonacox/tinytuya).
 
 ## Installation
-At current, the only way to install this is to copy the `custom_components/proscenic-850t-localtuya` directory into your `custom_components directory` so it looks like so:
+
+###HACS
+If you have [HACS](https://hacs.xyz/) available in your Home Assistant then add this repository as a [custom respository](https://hacs.xyz/docs/faq/custom_repositories/)
+ 
+###Manual
+Copy the `custom_components/proscenic-850t-localtuya` directory into your `custom_components directory` so it looks like so:
 ```
 └── ...
 └── configuration.yaml
