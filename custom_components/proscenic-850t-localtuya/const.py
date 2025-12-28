@@ -3,7 +3,7 @@
 from homeassistant.components.vacuum import DOMAIN as VACUUM_DOMAIN
 
 DOMAIN = "proscenic-850t-localtuya"
-DEFAULT_NAME = "Proscenic 850T Vacuum cleaner LocalTuya"
+DEFAULT_NAME = "Proscenic 850T Vacuum"
 DATA_KEY = f"{VACUUM_DOMAIN}.{DOMAIN}"
 
 CONF_LOCAL_KEY = "local_key"
