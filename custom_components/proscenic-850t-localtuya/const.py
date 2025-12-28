@@ -1,8 +1,6 @@
 """Constants for the proscenic integration."""
-from homeassistant.components.vacuum import (
-    DOMAIN as VACUUM_DOMAIN,
-    STATES as VACUUM_STATES
-)
+
+from homeassistant.components.vacuum import DOMAIN as VACUUM_DOMAIN
 
 DOMAIN = "proscenic-850t"
 DEFAULT_NAME = "Proscenic 850T Vacuum cleaner"
@@ -28,7 +26,3 @@ ATTR_WATER_SPEED_LIST = "water_speed_list"
 
 # in seconds
 REMEMBER_FAN_SPEED_DELAY = 6
-
-STATE_MOPPING = "mopping"
-
-STATES = VACUUM_STATES.append(STATE_MOPPING)
