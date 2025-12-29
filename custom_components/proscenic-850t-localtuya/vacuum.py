@@ -7,6 +7,11 @@ from functools import partial
 from typing import Dict, Optional, Union
 
 import voluptuous as vol
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorStateClass,
+)
 from homeassistant.components.vacuum import (
     ATTR_CLEANED_AREA,
     DOMAIN,
@@ -60,7 +65,6 @@ SUPPORT_PROSCENIC = (
     | VacuumEntityFeature.STOP
     | VacuumEntityFeature.RETURN_HOME
     | VacuumEntityFeature.FAN_SPEED
-    | VacuumEntityFeature.BATTERY
     | VacuumEntityFeature.CLEAN_SPOT
     | VacuumEntityFeature.START
     | VacuumEntityFeature.PAUSE
@@ -178,10 +182,12 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     device = Device(device_id, host, local_key)
     device.version = 3.3
 
-    robot = ProscenicVacuum(name, device, remember_fan_speed, enable_debug)
+    battery = ProscenicVacuumBattery(name)
+    robot = ProscenicVacuum(name, device, battery, remember_fan_speed, enable_debug)
     hass.data[DATA_KEY][host] = robot
+    hass.data[DATA_KEY][host + "_battery"] = battery
 
-    async_add_entities([robot], update_before_add=True)
+    async_add_entities([robot, battery], update_before_add=True)
 
     platform = entity_platform.current_platform.get()
 
@@ -192,22 +198,50 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     )
 
 
+class ProscenicVacuumBattery(SensorEntity):
+    """Battery level for 850T"""
+
+    _attr_native_unit_of_measurement = "%"
+    _attr_device_class = SensorDeviceClass.BATTERY
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    def __init__(self, name):
+        self._battery_level = -1
+        self._name = name + " Battery"
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def native_value(self):
+        return self._battery_level
+
+    def set_battery(self, new_level):
+        self._battery_level = new_level
+
+
 class ProscenicVacuum(StateVacuumEntity):
     """Representation of a Proscenic Vacuum cleaner robot."""
 
     def __init__(
-        self, name: str, device: Device, remember_fan_speed: bool, enable_debug: bool
+        self,
+        name: str,
+        device: Device,
+        battery: ProscenicVacuumBattery,
+        remember_fan_speed: bool,
+        enable_debug: bool,
     ):
         """Initialize the Proscenic vacuum cleaner robot."""
         self._name = name
         self._device = device
+        self._batteryDevice = battery
         self._remember_fan_speed = remember_fan_speed
         self._enable_debug = enable_debug
 
         self._available = False
         self._current_state: Optional[CurrentState] = None
         self._last_command: Optional[CleaningMode] = None
-        self._battery: Optional[int] = None
         self._fault: Fault = Fault.NO_ERROR
         self._fan_speed: FanSpeed = FanSpeed.NORMAL
         self._water_speed: WaterSpeedMode = WaterSpeedMode.MEDIUM
@@ -229,11 +263,6 @@ class ProscenicVacuum(StateVacuumEntity):
             return None
         else:
             return self._current_state.ha_state
-
-    @property
-    def battery_level(self) -> Optional[int]:
-        """Return the battery level of the vacuum cleaner."""
-        return self._battery
 
     @property
     def fan_speed(self):
@@ -400,7 +429,7 @@ class ProscenicVacuum(StateVacuumEntity):
                     self._current_state = CurrentState(int(v))
 
                 elif field == Fields.BATTERY:
-                    self._battery = int(v)
+                    self._batteryDevice.set_battery(int(v))
 
                 elif field == Fields.CLEAN_RECORD:
                     # TODO parsing
