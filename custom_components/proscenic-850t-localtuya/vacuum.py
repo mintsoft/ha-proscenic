@@ -257,7 +257,7 @@ class ProscenicVacuum(StateVacuumEntity):
     def activity(self) -> VacuumActivity | None:
         """Return the status of the vacuum cleaner."""
         if self._fault != Fault.NO_ERROR:
-            return VacuumActivity.Error
+            return VacuumActivity.ERROR
 
         if self._current_state is None:
             return None
