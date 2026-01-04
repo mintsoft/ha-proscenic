@@ -366,8 +366,10 @@ class ProscenicVacuum(StateVacuumEntity):
             self._parse_status_fields(state)
 
             self._available = True
-        except Exception as e:
-            _LOGGER.error("Got exception while fetching the state: %s", e)
+        except Exception as exc:
+            _LOGGER.error(
+                "Got exception while fetching the state: %s", exc, exc_info=True
+            )
             self._available = False
 
     async def async_remote_control(self, direction: str):
