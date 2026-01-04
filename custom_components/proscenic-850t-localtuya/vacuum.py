@@ -363,13 +363,12 @@ class ProscenicVacuum(StateVacuumEntity):
         """Fetch state from the device."""
         try:
             status = self._device.status()
-            self._parse_status_fields(status["dps"])
-
-            self._available = True
+            if "dps" in status:
+                self._parse_status_fields(status["dps"])
+                self._available = True
         except Exception as exc:
             _LOGGER.error(
-                "Got exception with status %s while fetching the state: %s",
-                status,
+                "Got exception while fetching the state: %s",
                 exc,
                 exc_info=True,
             )
