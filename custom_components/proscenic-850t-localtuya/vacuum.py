@@ -217,6 +217,10 @@ class ProscenicVacuumBattery(SensorEntity):
     def native_value(self):
         return self._battery_level
 
+    @property
+    def icon(self) -> str:
+        return "mdi:battery"
+
     def set_battery(self, new_level):
         self._battery_level = new_level
 
