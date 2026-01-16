@@ -261,6 +261,8 @@ class ProscenicVacuum(StateVacuumEntity):
     def activity(self) -> VacuumActivity | None:
         """Return the status of the vacuum cleaner."""
         if self._fault != Fault.NO_ERROR:
+            if self._enable_debug == True:
+                _LOGGER.warning("Fault returned! (%s)", self._fault)
             return VacuumActivity.ERROR
 
         if self._current_state is None:
@@ -366,10 +368,19 @@ class ProscenicVacuum(StateVacuumEntity):
     def update(self):
         """Fetch state from the device."""
         try:
+            if self._enable_debug == True:
+                _LOGGER.warning("About to check the status")
             status = self._device.status()
+            if self._enable_debug == True:
+                _LOGGER.warning("Status returned control back")
             if "dps" in status:
                 self._parse_status_fields(status["dps"])
                 self._available = True
+            else:
+                if self._enable_debug == True:
+                    _LOGGER.warning(
+                        "'dps' was not included in the status, doing nothing"
+                    )
         except Exception as exc:
             _LOGGER.error(
                 "Got exception while fetching the state: %s",
@@ -410,6 +421,8 @@ class ProscenicVacuum(StateVacuumEntity):
 
     def _parse_status_fields(self, state: Dict[str, Union[str, int, float, bool]]):
         """Tries to parse the state into the corresponding fields"""
+        if self._enable_debug == True:
+            _LOGGER.warning("Parsing status fields")
         for k, v in state.items():
             try:
                 field = Fields(int(k))
