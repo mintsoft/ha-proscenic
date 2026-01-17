@@ -422,7 +422,7 @@ class ProscenicVacuum(StateVacuumEntity):
     def _parse_status_fields(self, state: Dict[str, Union[str, int, float, bool]]):
         """Tries to parse the state into the corresponding fields"""
         if self._enable_debug == True:
-            _LOGGER.warning("Parsing status fields")
+            _LOGGER.warning("Parsing status fields: %s", list(state.keys()))
         for k, v in state.items():
             try:
                 field = Fields(int(k))
