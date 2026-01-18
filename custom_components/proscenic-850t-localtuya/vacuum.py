@@ -119,6 +119,7 @@ class Fields(Enum):
     CLEANING_MODE = 25  # rw
     DIRECTION_CONTROL = 26  # rw
     FAN_SPEED = 27  # rw
+    UNKNOWN_BOOL_33 = 33
     CURRENT_STATE = 38  # ro
     BATTERY = 39  # ro
     CLEAN_RECORD = 40  # ro
@@ -430,6 +431,7 @@ class ProscenicVacuum(StateVacuumEntity):
                     Fields.POWER,
                     Fields.CLEANING_MODE,
                     Fields.DIRECTION_CONTROL,
+                    Fields.UNKNOWN_BOOL_33
                 ):
                     continue
 
@@ -484,7 +486,7 @@ class ProscenicVacuum(StateVacuumEntity):
 
                 elif field == Fields.DEVICE_MODEL:
                     self._additional_attr[ATTR_DEVICE_MODEL] = v
-
+0
                 elif field == Fields.WATER_SPEED:
                     self._water_speed = WaterSpeedMode(v)
                     self._additional_attr[ATTR_WATER_SPEED] = self._water_speed.value
