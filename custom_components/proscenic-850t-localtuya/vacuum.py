@@ -431,7 +431,7 @@ class ProscenicVacuum(StateVacuumEntity):
                     Fields.POWER,
                     Fields.CLEANING_MODE,
                     Fields.DIRECTION_CONTROL,
-                    Fields.UNKNOWN_BOOL_33
+                    Fields.UNKNOWN_BOOL_33,
                 ):
                     continue
 
