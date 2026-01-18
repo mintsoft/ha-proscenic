@@ -23,7 +23,7 @@ from homeassistant.components.vacuum import (
 from homeassistant.const import CONF_DEVICE_ID, CONF_HOST, CONF_NAME
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_platform
-from tinytuya import OutletDevice as Device
+from tinytuya import OutletDevice as TinyTuyaDevice
 
 from .const import (
     ATTR_BRUSH_HEALTH,
@@ -180,7 +180,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     # Create handler
     _LOGGER.info("Initializing with host %s", host)
 
-    device = Device(device_id, host, local_key)
+    device = TinyTuyaDevice(device_id, host, local_key)
     device.version = 3.3
 
     battery = ProscenicVacuumBattery(name)
@@ -232,7 +232,7 @@ class ProscenicVacuum(StateVacuumEntity):
     def __init__(
         self,
         name: str,
-        device: Device,
+        device: TinyTuyaDevice,
         battery: ProscenicVacuumBattery,
         remember_fan_speed: bool,
         enable_debug: bool,
