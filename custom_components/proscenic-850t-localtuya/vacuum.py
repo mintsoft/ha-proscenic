@@ -119,7 +119,7 @@ class Fields(Enum):
     CLEANING_MODE = 25  # rw
     DIRECTION_CONTROL = 26  # rw
     FAN_SPEED = 27  # rw
-    UNKNOWN_BOOL_33 = 33
+    UNKNOWN_BOOL_33 = 33  # ro
     CURRENT_STATE = 38  # ro
     BATTERY = 39  # ro
     CLEAN_RECORD = 40  # ro
