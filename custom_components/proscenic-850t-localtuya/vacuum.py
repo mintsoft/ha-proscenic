@@ -182,7 +182,6 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     device = TinyTuyaDevice(device_id, host, local_key)
     device.version = 3.3
-    device.set_socketPersistent(True)
 
     battery = ProscenicVacuumBattery(name)
     robot = ProscenicVacuum(name, device, battery, remember_fan_speed, enable_debug)
