@@ -180,11 +180,8 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     # Create handler
     _LOGGER.info("Initializing with host %s", host)
 
-    device = TinyTuyaDevice(device_id, host, local_key)
-    device.version = 3.3
-
     battery = ProscenicVacuumBattery(name)
-    robot = ProscenicVacuum(name, device, battery, remember_fan_speed, enable_debug)
+    robot = ProscenicVacuum(name, device_id, host, local_key, battery, remember_fan_speed, enable_debug)
     hass.data[DATA_KEY][host] = robot
     hass.data[DATA_KEY][host + "_battery"] = battery
 
@@ -232,14 +229,18 @@ class ProscenicVacuum(StateVacuumEntity):
     def __init__(
         self,
         name: str,
-        device: TinyTuyaDevice,
+        device_id: str,
+        host: str,
+        local_key: str,
         battery: ProscenicVacuumBattery,
         remember_fan_speed: bool,
         enable_debug: bool,
     ):
         """Initialize the Proscenic vacuum cleaner robot."""
         self._name = name
-        self._device = device
+        self._device_id = device_id
+        self._host = host
+        self._local_key = local_key
         self._batteryDevice = battery
         self._remember_fan_speed = remember_fan_speed
         self._enable_debug = enable_debug
@@ -252,6 +253,8 @@ class ProscenicVacuum(StateVacuumEntity):
         self._water_speed: WaterSpeedMode = WaterSpeedMode.MEDIUM
         self._stored_fan_speed: FanSpeed = self._fan_speed
         self._additional_attr: Dict[str, Union[bool, str, int]] = dict()
+
+        self._initializeTinyTuyaDevice()
 
     @property
     def name(self) -> str:
@@ -374,14 +377,16 @@ class ProscenicVacuum(StateVacuumEntity):
             status = self._device.status()
             if self._enable_debug == True:
                 _LOGGER.warning("Status returned control back")
-            if "dps" in status:
+            if "dps" in status and len(status["dps"]) > 0:
                 self._parse_status_fields(status["dps"])
                 self._available = True
             else:
                 if self._enable_debug == True:
                     _LOGGER.warning(
-                        "'dps' was not included in the status, doing nothing"
+                        "either 'dps' was not included in the status, or the collection was empty, reinitializing"
                     )
+                    self._initializeTinyTuyaDevice()
+
         except Exception as exc:
             _LOGGER.error(
                 "Got exception while fetching the state: %s",
@@ -501,6 +506,11 @@ class ProscenicVacuum(StateVacuumEntity):
                     )
 
                 continue
+
+    def _initializeTinyTuyaDevice()
+        device = TinyTuyaDevice(self._device_id, self._host, self._local_key)
+        device.version = 3.3
+        self._device = device
 
     async def _wait_and_set_stored_fan_speed(self):
         _LOGGER.debug("Wainting %d seconds before setting the fan speed")
