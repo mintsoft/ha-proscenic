@@ -507,7 +507,7 @@ class ProscenicVacuum(StateVacuumEntity):
 
                 continue
 
-    def _initializeTinyTuyaDevice():
+    def _initializeTinyTuyaDevice(self):
         device = TinyTuyaDevice(self._device_id, self._host, self._local_key)
         device.version = 3.3
         self._device = device
