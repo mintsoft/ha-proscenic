@@ -381,10 +381,9 @@ class ProscenicVacuum(StateVacuumEntity):
                 self._parse_status_fields(status["dps"])
                 self._available = True
             else:
-                if self._enable_debug == True:
-                    _LOGGER.warning(
-                        "either 'dps' was not included in the status, or the collection was empty, reinitializing"
-                    )
+                _LOGGER.warning(
+                    "either 'dps' was not included in the status, or the collection was empty, reinitializing"
+                )
                 self._initializeTinyTuyaDevice()
 
         except Exception as exc:
