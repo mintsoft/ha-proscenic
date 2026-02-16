@@ -385,7 +385,7 @@ class ProscenicVacuum(StateVacuumEntity):
                     _LOGGER.warning(
                         "either 'dps' was not included in the status, or the collection was empty, reinitializing"
                     )
-                    self._initializeTinyTuyaDevice()
+                self._initializeTinyTuyaDevice()
 
         except Exception as exc:
             _LOGGER.error(
